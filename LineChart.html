@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="https://d3js.org/d3.v7.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <ul>
+        <li>Line Plot</li>
+        <li>Axes</li>
+    </ul>
+    <svg id="plot"></svg>
+    <script>
+        const width=600;
+        const height=400;
+        const margin={"top":30, "bottom":30, "left":30, "right":30};
+        const data=Array.from({length:301}, (_,i)=> [-Math.PI+2*Math.PI*i/300, Math.sin(-Math.PI+2*Math.PI*i/300)]
+                )
+        d3.select("#plot").attr("width",width).attr("height",height);
+        var x = d3.scaleLinear()
+            .domain(d3.extent(data.map(d=>d[0])))
+            .range([margin.left, width - margin.right])
+            .interpolate(d3.interpolateRound)
+        var y = d3.scaleLinear()
+            .domain(d3.extent(data.map(d=>d[1])))
+            .range([height - margin.bottom, margin.top])
+            .interpolate(d3.interpolateRound)
+        var line=d3.line()
+                .x(d=>x(d[0]))
+                .y(d=>y(d[1]))
+        d3.select("#plot").append("path").attr("d",line(data)).attr("fill","none").attr("stroke","blue")
+        // d3.select("#plot").append("path").datum(data).attr("d",line).attr("fill","none").attr("stroke","blue") // the same as above line
+        var x_axis = d3.axisBottom().scale(x);
+        d3.select("#plot").append("g").call(x_axis).attr("transform",`translate(0, ${y(0)})`);
+        var y_axis = d3.axisLeft().scale(y);
+        d3.select("#plot").append("g").attr("transform",`translate(${margin.left}, 0)`).call(y_axis)
+            .call(g => g.select(".domain").remove());
+
+    </script>
+    
+</body>
+</html>

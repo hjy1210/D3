@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="https://d3js.org/d3.v7.min.js"></script>
+    <title>D3 Event</title>
+</head>
+
+<body>
+    <h1>Event Console output</h1>
+    <ul>
+        <li><a href="https://github.com/d3/d3-selection/blob/v3.0.0/README.md#selection_on">d3.selection.on</a></li>
+    </ul>
+    <h2>svg1</h2>
+    <svg id="svg1" width="300" height="200"></svg>
+    <h2>svg2</h2>
+    <svg id="svg2" width="300" height="200"></svg>
+    <script>
+        const datum = [1, 2];
+        d3.select("#svg1").selectAll("circle").data(datum)
+            .enter()
+            .append("circle")
+            .attr("r", d => d * 10).attr("cx", d => d * 75).attr("cy", d => d * 50)
+            .on("mouseover", function (e, d) { console.log(this.getAttribute("r"), e.currentTarget.getAttribute("r")); })
+            .on("click", function (e, d) { show(e, d) })
+        const svg2 = d3.select("#svg2");
+        datum.forEach((d, i) => {
+            svg2.append("circle")
+                .attr("r", d * 10).attr("cx", d * 75).attr("cy", d * 50)
+                .on("click", function (e) { show(e, d) })
+        });
+
+        function show(e, d) {
+            console.log(d, parseFloat(e.currentTarget.getAttribute("cx")),
+                parseFloat(e.currentTarget.getAttribute("cy")),
+                parseFloat(e.currentTarget.getAttribute("r")))
+        }
+    </script>
+</body>
+
+</html>

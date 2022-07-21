@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<!--<script type = "text/javascript" src = "https://d3js.org/d3.v7.min.js"></script>-->
+</head>
+
+<body>
+	<script type="module">
+	</script>
+	<h1>What time is it?</h1>
+	<div>
+		<svg width="600" height="600" style="background-color:pink">
+			<circle cx="300" cy="300" r="280" fill="white" stroke="blue" stroke-width="3"></circle>
+			<line id="hour" x1="0" y1="0" x2="0" y2="-160" stroke-width="5" stroke="black" transform="translate(300,300)"></line>
+			<line id="minute" x1="0" y1="0" x2="0" y2="-200" stroke-width="2" stroke="black" transform="translate(300,300)"></line>
+			<g id="clock">
+			</g>
+		</svg>
+	</div>
+
+	<script type="module">
+		import * as d3 from "https://cdn.skypack.dev/d3@7";
+		var showminute = true;
+		var circle = d3.select("#clock").selectAll("circle")
+			.data([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+			.enter().append("circle")
+			.attr("cx", function (d) { return 300; })
+			.attr("cy", function (d) { return 300; })
+			.attr("r", d => d * 20)
+			.style("fill", "none")
+			.attr("stroke", "black")
+
+	</script>
+</body>
+
+</html>

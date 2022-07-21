@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="https://d3js.org/d3.v7.min.js"></script>
+    <title>LearnShapes</title>
+</head>
+<body>
+    <ul>
+        <li>Line: d3.line()</li>
+        <li>Axes: d3.axisLeft(), d3.axisBottom()</li>
+        <li>Pie: d3.pie(), d3.arc()</li>
+    </ul>
+    <svg id="svg"></svg>
+    <svg id="pie"></svg>
+    <script>
+        const width=600;
+        const height=400;
+        const margin={"top":30, "bottom":30, "left":30, "right":30};
+        const xs=Array.from({length:301}, (_,i)=>-Math.PI+2*Math.PI*i/300);
+        const data=xs.map(x=>[x,Math.sin(x)]);
+        const fruits = [
+            {name: "🍊", count: 21},
+            {name: "🍇", count: 13},
+            {name: "🍏", count: 8},
+            {name: "🍌", count: 5},
+            {name: "🍐", count: 3},
+            {name: "🍋", count: 2},
+            {name: "🍎", count: 1},
+            {name: "🍉", count: 1}
+        ]
+        const xscale = d3.scaleLinear()
+                         .domain(d3.extent(data.map(x=>x[0])))
+                         .range([margin.left, width-margin.right])
+                         .interpolate(d3.interpolateRound);
+        const yscale = d3.scaleLinear()
+                         .domain(d3.extent(data.map(x=>x[1])))
+                         .range([height-margin.bottom, margin.top])
+                         .interpolate(d3.interpolateRound);
+        const line = d3.line().x(d=>xscale(d[0])).y(d=>yscale(d[1]));
+        const svg = d3.select("#svg").attr("width",width).attr("height",height);
+        svg.append("path").attr("d", line(data)).attr("stroke", "blue").attr("fill","none");
+
+        const xaxis = d3.axisBottom().scale(xscale);
+        svg.append("g").attr("transform", `translate(0, ${yscale(0)})`).call(xaxis);
+
+        const yaxis = d3.axisLeft().scale(yscale);
+        svg.append("g").attr("transform", `translate(${margin.left},0)`)
+            .call(yaxis)
+            .call(g=>g.select(".domain").remove());
+
+        const pie = d3.select("#pie").attr("width",640).attr("height",640).attr("text-anchor","middle") ;
+        const pieg = pie.append("g").attr("transform", "translate(320,320)")
+        const pieArcData = d3.pie().value(d => d.count)(fruits);
+        const arcPie = d3.arc()
+            .innerRadius(210)
+            .outerRadius(310)
+            .padRadius(300)
+            .padAngle(2 / 300)
+            .cornerRadius(8);
+        pieArcData.forEach(d=>{
+            pieg.append("path").attr("d", arcPie(d)).attr("fill","steelblue");
+            var text = pieg.append("text").attr("fill","white")
+                .attr("transform", `translate(${arcPie.centroid(d).join(",")})`)
+                .attr("font-family","sans-serif")
+            text.append("tspan").attr("x",0).attr("font-size", 24).text(`${d.data.name}`)
+            text.append("tspan").attr("x",0).attr("font-size", 12).attr("dy","1.3em").text(`${d.value.toLocaleString("ch-tw")}`)
+        });
+
+    </script>
+   
+</body>
+</html>

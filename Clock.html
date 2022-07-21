@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<script type="text/javascript" src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+	<script>
+		var showminute = true;
+	</script>
+	<h1>What time is it?</h1>
+	<div>
+		<svg id="clock" width="600" height="600" style="background-color:pink">
+			<g transform="scale(2)">
+				<circle cx="150" cy="150" r="140" fill="white" stroke="blue" stroke-width="3"></circle>
+				<line id="hour" x1="0" y1="0" x2="0" y2="-80" stroke-width="5" stroke="black"></line>
+				<line id="minute" x1="0" y1="0" x2="0" y2="-100" stroke-width="2" stroke="blue"></line>
+				<g id="hourg"></g>
+				<g id="minuteg"></g>
+			</g>
+		</svg>
+	</div>
+	<button id = "advanceButton" onclick="advanceTime()" style="font-size:16pt">Advance 1 minute</button>
+	<label style="font-size:16pt"> Show Minute</label> <input type="checkbox" onchange="toggleShow()" style="width:20px; height:20px;" >
+	<label style="font-size:16pt"> Advance 5 Minutes</label> <input type="checkbox" onchange="setStep()" style="width:20px; height:20px;">
+
+	<script>
+		var hour = 0;
+		var minute = 0;
+		var showminute = false;
+		var step = 1;
+		const hours = Array.from({ length: 12 }, (d, i) => ({
+			"text": "" + (i + 1),
+			"p": [150 + Math.sin((i + 1) * Math.PI / 6) * 120, 150 - Math.cos((i + 1) * Math.PI / 6) * 120]
+		}))
+		d3.select("#hourg").selectAll("circle").data(hours).enter().append("circle")
+			.attr("cx", d => d.p[0])
+			.attr("cy", d => d.p[1])
+			.attr("r", 9.2)
+			.style("fill", "none")
+			.attr("stroke", "black");
+		d3.select("#hourg").selectAll("text").data(hours).enter().append("text").text(d => d.text)
+			.attr("text-anchor", "middle").attr("x", d => d.p[0])
+			.attr("y", d => d.p[1])
+			.attr("dy", ".35em").attr("dx");
+		const minutes = Array.from({ length: 60 }, (d, i) => ({
+			"text": "" + i,
+			"p": [150 + Math.sin(i * Math.PI / 30) * 133, 150 - Math.cos(i * Math.PI / 30) * 133]
+		}))
+		d3.select("#minuteg").selectAll("text").data(minutes).enter().append("text").text(d => d.text)
+			.attr("text-anchor", "middle").attr("font-size", 7)
+			.attr("fill", d => (parseInt(d.text) % 5 == 0) ? "red" : "black")
+			.attr("x", d => d.p[0])
+			.attr("y", d => d.p[1])
+			.attr("dy", ".35em").attr("dx");
+
+		function advanceTime() {
+			minute = (minute + step) % 1440;
+			hour = minute / 60;
+			showTime();
+		}
+		//d3.select("#minute").attr("stroke-width", showminute ? 2 : 0);
+		showTime();
+		function toggleShow() {
+			//alert("hi");
+			showminute = !showminute;
+			showTime();
+		}
+		function setStep() {
+			//alert("hi");
+			//showminute = !showminute;
+			step = step == 1 ? 5:1;
+			d3.select("#advanceButton").text(step == 1 ?`Advance 1 minute` : `Advance 5 minutes`);
+			//showTime();
+		}
+		function showTime() {
+			var mindeg = (minute * 6) %360;
+			hour = (minute/60) % 24;
+			var degree = (hour * 30) % 360;
+		
+			d3.select("#hour").attr("transform", `translate(${150},${150}) rotate(${degree})`);
+			d3.select("#minute").attr("stroke-width", showminute ? 2 : 0)
+				.attr("transform", `translate(${150},${150}) rotate(${mindeg})`);
+		}
+
+	</script>
+</body>
+
+</html>

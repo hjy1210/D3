@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="https://d3js.org/d3.v7.min.js"></script>
+    <title>Interaction</title>
+</head>
+<body>
+    <ul>
+        <li><a href="https://www.geeksforgeeks.org/how-to-read-a-local-text-file-using-javascript/">Read Local File</a></li>
+        <li><a href="https://www.tutorialspoint.com/d3js/d3js_delimiterseparated_values_api.htm">d3.csvParse</a></li>
+        <li><a href="https://observablehq.com/@d3/learn-d3-interaction?collection=@d3/learn-d3">D3 Interaction</a></li>
+    </ul>
+    <input type="file" name="inputfile" id="inputfile">
+    <br>
+
+    <svg id="plot"><rect width="10" height="30" fill="none" pointer-events="all"><title>Hi everybody</title></rect></svg>
+
+
+    <script type="text/javascript">
+        var data=[];
+        document.getElementById('inputfile')
+            .addEventListener('change', function() {
+      
+                var fr=new FileReader();
+                fr.onload=function(){
+                    //document.getElementById('output').textContent=fr.result;
+                    data = d3.csvParse(fr.result, function(d) {
+                        return {
+                            date: new Date(d.date), // lowercase and convert "Year" to Date
+                            close: parseFloat(d.close),
+                            lower: parseFloat(d.lower),
+                            middle: parseFloat(d.middle),
+                            upper: parseFloat(d.upper)
+                        };
+                    });
+                    showData();
+                }
+      
+                fr.readAsText(this.files[0]);
+                
+            })
+    var titleg;
+    var textDate;
+    var textClose;
+    var x;
+    var y;  
+    const formatDate = d3.utcFormat("%b %-d, ’%y")
+    const formatClose = d3.format("$.2f")
+    function showData(){
+        const width=600;
+        const height=400;
+        const margin={"top":30, "bottom":30, "left":40, "right":30};
+        // const data=Array.from({length:301}, (_,i)=> [-Math.PI+2*Math.PI*i/300, Math.sin(-Math.PI+2*Math.PI*i/300)])
+        d3.select("#plot").attr("width",width).attr("height",height);
+        x = d3.scaleUtc()
+            .domain(d3.extent(data, d=>d.date))
+            .range([margin.left, width - margin.right])
+            
+        y = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d.upper)])
+            .range([height - margin.bottom, margin.top])
+            
+        var line=d3.line()
+                .x(d=>x(d.date))
+                .y(d=>y(d.close))
+        d3.select("#plot").append("path").attr("d",line(data)).attr("fill","none").attr("stroke","blue")
+        // d3.select("#plot").append("path").datum(data).attr("d",line).attr("fill","none").attr("stroke","blue") // the same as above line
+        var x_axis = d3.axisBottom().scale(x).ticks(width / 80).tickSizeOuter(0);
+        d3.select("#plot").append("g").call(x_axis).attr("transform",`translate(0, ${height-margin.bottom})`);
+        var y_axis = d3.axisLeft().scale(y).ticks(height / 40);
+        d3.select("#plot").append("g").attr("transform",`translate(${margin.left}, 0)`).call(y_axis)
+            .call(g => g.select(".domain").remove());
+        
+        titleg = d3.select("#plot").append("g").attr("font-size",10)
+        titleg.append("rect").attr("x","-27").attr("width","54").attr("y","-30")
+            .attr("height","20").attr("fill","white")
+        textDate = titleg.append("text").attr("y", -22).attr("text-anchor","middle");
+        textClose = titleg.append("text").attr("y", -12).attr("text-anchor","middle");
+        titleg.append("circle").attr("r", 2.5).attr("fill", "red");
+        const rectg = d3.select("#plot").append("g").attr("fill", "none").attr("pointer-events","all")
+            .selectAll("rect").data(d3.pairs(data))  /////注意與下面的forEach的相異處
+            .enter().append("rect")
+            .attr("x",d=>x(d[0].date))
+            .attr("height",height)
+            .attr("width", d=>x(d[1].date) - x(d[0].date))
+            .on("mouseover", function(e,d){show(d)})
+            .on("mouseout", hide())
+        /*const pairs = d3.pairs(data);
+        pairs.forEach((d,i)=>{
+          rectg.append("rect")
+            .attr("x",x(d[0].date))
+            .attr("height",height)
+            .attr("width", x(d[1].date) - x(d[0].date))
+            .on("mouseover", function(e){show(d)})
+            .on("mouseout", hide())
+        })*/
+    }
+    function show(d) {
+            textDate.text(formatDate(d[0].date));
+            textClose.text(formatClose(d[0].close));
+            titleg.attr("transform", `translate(${x(d[0].date)},${y(d[0].close)})`).attr("display", true);
+    }
+
+    function hide(){
+        return function(){
+            titleg.attr("diaplay", "none")
+
+        }
+    }
+
+    </script>
+
+</body>
+</html>
