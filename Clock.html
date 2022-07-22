@@ -10,26 +10,47 @@
 		var showminute = true;
 	</script>
 	<h1>What time is it?</h1>
+	<p style="font-size:16pt">Tap on circle of hour needle to advance 5 minytes, tap on circle of ninute needle to advance one minute</p>
 	<div>
 		<svg id="clock" width="600" height="600" style="background-color:pink">
 			<g transform="scale(2)">
 				<circle cx="150" cy="150" r="140" fill="white" stroke="blue" stroke-width="3"></circle>
-				<line id="hour" x1="0" y1="0" x2="0" y2="-80" stroke-width="5" stroke="black"></line>
-				<line id="minute" x1="0" y1="0" x2="0" y2="-100" stroke-width="2" stroke="blue"></line>
+				<g id="minute">
+					<line  x1="0" y1="0" x2="0" y2="-100" stroke-width="2" stroke="blue"></line>
+					<circle cx="0" cy="-100" r="8" fill="blue" />
+				</g>
+				<g id="hour">
+					<line  x1="0" y1="0" x2="0" y2="-60" stroke-width="5" stroke="black"></line>
+					<circle cx="0" cy="-60" r="8" />
+				</g>
 				<g id="hourg"></g>
 				<g id="minuteg"></g>
 			</g>
 		</svg>
 	</div>
-	<button id = "advanceButton" onclick="advanceTime()" style="font-size:16pt">Advance 1 minute</button>
-	<label style="font-size:16pt"> Show Minute</label> <input type="checkbox" onchange="toggleShow()" style="width:20px; height:20px;" >
-	<label style="font-size:16pt"> Advance 5 Minutes</label> <input type="checkbox" onchange="setStep()" style="width:20px; height:20px;">
+	<div>
+		<button id = "advanceButton" onclick="advanceTime(step)" style="font-size:16pt">Advance 1 minute</button>
+		<label style="font-size:16pt"> Show Minute</label> <input type="checkbox" checked onchange="toggleShow()" style="width:20px; height:20px;" >
+		<label style="font-size:16pt"> Advance 5 Minutes</label> <input type="checkbox" onchange="setStep()" style="width:20px; height:20px;">
+	</div>
+	<div>
+		<label style="font-size:16pt"> Display Time</label> <input type="checkbox" onchange="toggleTime()" style="width:20px; height:20px;" >
+		<p id="time" style="font-size:16pt"></p>
+	</div>
 
 	<script>
 		var hour = 0;
 		var minute = 0;
-		var showminute = false;
+		var showminute = true;
+		var displaytime = false;
 		var step = 1;
+		const numberlit = ["zero","one","two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+			"eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen",
+			"twenty","twenty one","twenty two", "twenty three", "twenty four", "twenty five", "twenty six", "twenty seven", "twenty eight", "twenty nine",
+			"thirty ","thirty one","thirty two", "thirty three", "thirty four", "thirty five", "thirty six", "thirty seven", "thirty eight", "thirty nine",
+			"fourty ","fourty one","fourty two", "fourty three", "fourty four", "fourty five", "fourty six", "fourty seven", "fourty eight", "fourty nine",
+			"fifty ","fifty one","fifty two", "fifty three", "fifty four", "fifty five", "fifty six", "fifty seven", "fifty eight", "fifty nine"
+		]
 		const hours = Array.from({ length: 12 }, (d, i) => ({
 			"text": "" + (i + 1),
 			"p": [150 + Math.sin((i + 1) * Math.PI / 6) * 120, 150 - Math.cos((i + 1) * Math.PI / 6) * 120]
@@ -55,16 +76,23 @@
 			.attr("y", d => d.p[1])
 			.attr("dy", ".35em").attr("dx");
 
-		function advanceTime() {
-			minute = (minute + step) % 1440;
+		function advanceTime(step) {
+			minute = (minute + step) % 720;
 			hour = minute / 60;
 			showTime();
 		}
+		d3.select('#hour').on("touchstart", (ev) =>advanceTime(5));
+		d3.select('#minute').on("touchstart", (ev)=>advanceTime(1));
 		//d3.select("#minute").attr("stroke-width", showminute ? 2 : 0);
 		showTime();
 		function toggleShow() {
 			//alert("hi");
 			showminute = !showminute;
+			showTime();
+		}
+		function toggleTime() {
+			//alert("hi");
+			displaytime = !displaytime;
 			showTime();
 		}
 		function setStep() {
@@ -75,13 +103,24 @@
 			//showTime();
 		}
 		function showTime() {
-			var mindeg = (minute * 6) %360;
-			hour = (minute/60) % 24;
+			//minute = minute %60;
+			var mindeg = ((minute%60) * 6) %360;
+			hour = (minute/60) % 12;
 			var degree = (hour * 30) % 360;
 		
 			d3.select("#hour").attr("transform", `translate(${150},${150}) rotate(${degree})`);
-			d3.select("#minute").attr("stroke-width", showminute ? 2 : 0)
+			d3.select("#minute").attr("display", showminute?true:"none")
 				.attr("transform", `translate(${150},${150}) rotate(${mindeg})`);
+			d3.select('#time').text(displaytime?`Current time is : ${numberHour(hour)} ${numberMinute(minute)}`:"");
+
+		}
+		function numberHour(hour){
+			var h = Math.floor(hour %12);
+			return h==0 ? "twelve" : numberlit[h]
+		}
+		function numberMinute(minute){
+			var m = minute % 60;
+			return m==0? "oclock":numberlit[m]
 		}
 
 	</script>

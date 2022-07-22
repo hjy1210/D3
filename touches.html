@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="https://d3js.org/d3.v7.min.js"></script>
+
+    <title>Document</title>
+</head>
+<body>
+    <pre>
+<p id="p">Windows IP 設定
+
+
+    無線區域網路介面卡 區域連線* 1:
+    
+       媒體狀態 . . . . . . . . . . . . .: 媒體已中斷連線
+       連線特定 DNS 尾碼 . . . . . . . . :
+    
+    無線區域網路介面卡 區域連線* 2:
+    
+       媒體狀態 . . . . . . . . . . . . .: 媒體已中斷連線
+       連線特定 DNS 尾碼 . . . . . . . . :
+    
+    無線區域網路介面卡 Wi-Fi:
+    
+       連線特定 DNS 尾碼 . . . . . . . . :
+       連結-本機 IPv6 位址 . . . . . . . : fe80::5510:17c2:12c3:f5b9%8
+       IPv4 位址 . . . . . . . . . . . . : 192.168.50.225
+       子網路遮罩 . . . . . . . . . . . .: 255.255.255.0
+       預設閘道 . . . . . . . . . . . . .: 192.168.50.1
+    
+    乙太網路卡 藍牙網路連線:
+    
+       媒體狀態 . . . . . . . . . . . . .: 媒體已中斷連線
+       連線特定 DNS 尾碼 . . . . . . . . :</p>   
+    </pre>
+    <script>
+        document.getElementById("p")
+          .addEventListener("touchstart",f)
+        document.getElementById("p")
+          .addEventListener("touchend",f)
+        function f(ev){
+            //console.log(ev);
+            if (ev.changedTouches.length>0){
+                console.log(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY)
+            }
+                
+        }
+    </script>
+</body>
+</html>
