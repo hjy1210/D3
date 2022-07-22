@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script type="text/javascript" src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+    <title>Taiwan County</title>
+    <style>
+        .towns {
+            fill:#33474e;
+        }
+        .towns :hover {
+            fill: #7f9ca7;
+            transition: 0.5s;
+        }
+        .town-borders {
+            fill: none;
+            stroke: #fff;
+            stroke-width: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <ul>
+        <li>從 <a href="https://ithelp.ithome.com.tw/articles/10223786">[ D3.js ] 繪製臺灣地圖</a>學到如何繪製地圖</li>
+        <li>用 <a href="https://mapshaper.org/">mapshaer</a> 網站將shp檔案轉成Topojson檔案，並適度降低解析度</li>
+        <li>台灣行政區的shp檔案取自<a href="https://data.gov.tw/dataset/7441">政府資料開放平台</a></li>
+    </ul>
+    <input type="file" name="inputfile" id="inputfile">
+    <div id="app">
+        <svg width='500' height='500' style='border:1px solid #00000060;'>
+            <g class="towns"></g>
+            <path class="town-borders"></path>
+        </svg>
+    </div>
+    <script>
+        var data="";
+        document.getElementById('inputfile')
+            .addEventListener('change', function() {
+      
+                var fr=new FileReader();
+                fr.onload=function(){
+                    data = JSON.parse(fr.result);
+                    //console.log(data)
+                    //console.log(data.objects["TOWN_MOI_1100415"].geometries)
+                    draw(data);
+                }
+      
+                fr.readAsText(this.files[0]);
+                
+            })
+
+        function draw(mapData) {
+            let projection = d3.geoMercator()
+                .center([123, 24]).scale(5500);
+            let path = d3.geoPath(projection);
+            d3.select('g.towns')
+                .selectAll("path")
+                .data(topojson.feature(mapData, mapData.objects["TOWN_MOI_1100415"]).features)
+                .enter().append("path")
+                .attr("d", path);
+
+            d3.select('path.town-borders')
+                .attr("d", path(topojson.mesh(mapData, mapData.objects["TOWN_MOI_1100415"], function (a, b) { return a !== b; })));
+        }
+
+    </script>
+</body>
+</html>
