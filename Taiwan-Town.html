@@ -60,7 +60,8 @@
                 .selectAll("path")
                 .data(topojson.feature(mapData, mapData.objects["TOWN_MOI_1100415"]).features)
                 .enter().append("path")
-                .attr("d", path);
+                .attr("d", path)
+                .on("mouseover", (e,d)=> console.log(`${d.properties.COUNTYNAME} ${d.properties.TOWNNAME}`));
 
             d3.select('path.town-borders')
                 .attr("d", path(topojson.mesh(mapData, mapData.objects["TOWN_MOI_1100415"], function (a, b) { return a !== b; })));
