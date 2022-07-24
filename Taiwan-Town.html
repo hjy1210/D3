@@ -43,6 +43,12 @@
                 var fr=new FileReader();
                 fr.onload=function(){
                     data = JSON.parse(fr.result);
+                    data.objects['TOWN_MOI_1100415'].geometries=data.objects['TOWN_MOI_1100415'].geometries
+                        .filter(d=>d.properties.COUNTYNAME=="新北市" || 
+                            d.properties.COUNTYNAME=="臺北市" ||
+                            d.properties.COUNTYNAME=="基隆市" //||
+                            //d.properties.COUNTYNAME=="宜蘭縣"
+                            )
                     //console.log(data)
                     //console.log(data.objects["TOWN_MOI_1100415"].geometries)
                     draw(data);
@@ -54,7 +60,8 @@
 
         function draw(mapData) {
             let projection = d3.geoMercator()
-                .center([123, 24]).scale(5500);
+                //.center([123, 24]).scale(5500);
+                .fitSize([500,500], topojson.feature(mapData, mapData.objects["TOWN_MOI_1100415"]));
             let path = d3.geoPath(projection);
             d3.select('g.towns')
                 .selectAll("path")
