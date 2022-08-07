@@ -4,25 +4,84 @@ span:hover {
   background-color: yellow;
   cursor:hand;
 }
+span.active:hover {
+  background-color: lightblue;
+  cursor:hand;
+}
+span.active {
+  background-color: lightblue;
+  cursor:hand;
+}
 span.guanglun {
   font-family:標楷體;
   font-size:16pt;
 }
 </style>
 <body>
-<p><span  class="guanglun" onclick="document.getElementById('iframe').setAttribute('src','https://lamrim.xyz/player2/?&tch=gl1&af1=12b&st1=432&et1=608')">第二說法軌理分四,一思惟說法所有勝利,二發起承事大師及法,三以何意樂加行而說,四於何等境應說不說所有差別。</span></p>
-<p>
-<span  class="guanglun" onclick="document.getElementById('iframe').setAttribute('src','https://lamrim.xyz/player2/?&tch=gl1&af1=12b&st1=608&et1=742')">
-若不顧慮利養恭敬名等染事，而說法者勝利極大。《勸發增上意樂》中云：「慈氏，無染法施，謂不希欲，利養恭敬，而施法施。此二十種是其勝利。
-</span>
-</p>
-<!--<a href="https://lamrim.xyz/player2/?&tch=gl1&af1=11a&st1=1527&af2=11b&et2=41" target="_blank">link</a>
-<a href="https://lamrim.xyz/player2/?&tch=gl1&af1=11a&st1=1527&af2=11b&et2=41" >link2</a>-->
-<div>
-<iframe width="100%" height="480" id="iframe" ></iframe>
+<div width="100%" id="source">
 </div>
-<script type="javascript">
-alert('hi');
+<div>
+<iframe width="100%" height="100%" id="iframe" ></iframe>
+</div>
+<script>
+  var data = [{
+      newpar: false,
+      source:"第二說法軌理分四,一思惟說法所有勝利,二發起承事大師及法,三以何意樂加行而說,四於何等境應說不說所有差別。",
+      startvol:"12b",
+      starttime:"7:12",
+      endtime:"10:8"
+    }, {
+      newpar: true,
+      source:"若不顧慮利養恭敬名等染事，而說法者勝利極大。《勸發增上意樂》中云：「慈氏，無染法施，謂不希欲，利養恭敬，而施法施。此二十種是其勝利。",
+      startvol:"12b",
+      starttime:"10:08",
+      endtime:"12:22"
+    }
+  ];
+  var curparagraph = null;
+  const iframe= document.getElementById('iframe');
+  var activeSpan=null;
+  function setYinDang(element){
+    if (activeSpan == element) return;
+    if (activeSpan!=null) 
+      activeSpan.classList.remove("active");
+    activeSpan = element;
+    element.classList.add("active");
+    iframe.setAttribute("src", element.getAttribute("src"));
+  }
+  function setup(data){
+    curparagraph = null;
+    activeSpan = null;
+    const sourcediv=document.getElementById("source");
+    data.forEach((item)=>{
+      if (item.newpar || curparagraph==null) {
+        curparagraph=document.createElement("p");
+        sourcediv.appendChild(curparagraph)
+      }
+      var span = document.createElement("span");
+      span.classList.add("guanglun");
+      span.textContent=item.source;
+      var src=`https://lamrim.xyz/player2/?&tch=gl1&af1=${item.startvol}&st1=${minsec2sec(item.starttime)}`;
+      if (item.endvol && item.endvol!=item.startvol){
+        src = src + `&af2=${item.endvol}&et2=${minsec2sec(item.endtime)}`
+      } else {
+        src = src + `&et1=${minsec2sec(item.endtime)}`
+      }
+      span.setAttribute("src", src);
+      span.addEventListener("click", (ev) => setYinDang(ev.target));
+      curparagraph.appendChild(span)
+    })
+  }
+  function minsec2sec(minsec){
+    var tokens=minsec.split(":")
+    if (tokens.length==1)
+      return parseInt(minsec);
+    else if (tokens.length==2) {
+      return parseInt(tokens[0])*60+parseInt(tokens[1]);
+    }
+    else return 0;
+  }
+  setup(data);
 </script>
 </body>
 </html>
