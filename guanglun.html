@@ -18,28 +18,53 @@ span.guanglun {
 }
 </style>
 <body>
+<button id="btnConvert" >廣論原文</button>
+<textarea id="data" rows="20" cols="40" style="display:block; font-size:16pt;">
+[
+ {
+    "newpar": false,
+    "source":"第二說法軌理分四,一思惟說法所有勝利,二發起承事大師及法,三以何意樂加行而說,四於何等境應說不說所有差別。",
+    "startvol":"12b",
+    "starttime":"7:12",
+    "endtime":"10:8"
+ }, 
+ {
+    "newpar": true,
+    "source":"若不顧慮利養恭敬名等染事，而說法者勝利極大。《勸發增上意樂》中云：「慈氏，無染法施，謂不希欲，利養恭敬，而施法施。此二十種是其勝利。",
+    "startvol":"12b",
+    "starttime":"10:08",
+    "endtime":"12:22"
+ }
+]
+</textarea>
 <div width="100%" id="source">
 </div>
 <div>
-<iframe width="100%" height="100%" id="iframe" ></iframe>
+<iframe width="100%" height="80%" id="iframe" ></iframe>
 </div>
 <script>
+  const title1="在下面的文字方塊中填上音檔相關資料後，按本鍵製作音檔連結";
+  const title2="要更新音檔資料，請按此鍵";
   var data = [{
-      newpar: false,
-      source:"第二說法軌理分四,一思惟說法所有勝利,二發起承事大師及法,三以何意樂加行而說,四於何等境應說不說所有差別。",
-      startvol:"12b",
-      starttime:"7:12",
-      endtime:"10:8"
+      "newpar": false,
+      "source":"第二說法軌理分四,一思惟說法所有勝利,二發起承事大師及法,三以何意樂加行而說,四於何等境應說不說所有差別。",
+      "startvol":"12b",
+      "starttime":"7:12",
+      "endtime":"10:8"
     }, {
-      newpar: true,
-      source:"若不顧慮利養恭敬名等染事，而說法者勝利極大。《勸發增上意樂》中云：「慈氏，無染法施，謂不希欲，利養恭敬，而施法施。此二十種是其勝利。",
-      startvol:"12b",
-      starttime:"10:08",
-      endtime:"12:22"
+      "newpar": true,
+      "source":"若不顧慮利養恭敬名等染事，而說法者勝利極大。《勸發增上意樂》中云：「慈氏，無染法施，謂不希欲，利養恭敬，而施法施。此二十種是其勝利。",
+      "startvol":"12b",
+      "starttime":"10:08",
+      "endtime":"12:22"
     }
   ];
   var curparagraph = null;
   const iframe= document.getElementById('iframe');
+  const btnConvert=document.getElementById("btnConvert");
+  btnConvert.setAttribute("title", title1);
+  const textareaData = document.getElementById("data");
+  const sourceDiv=document.getElementById("source");
   var activeSpan=null;
   function setYinDang(element){
     if (activeSpan == element) return;
@@ -52,11 +77,11 @@ span.guanglun {
   function setup(data){
     curparagraph = null;
     activeSpan = null;
-    const sourcediv=document.getElementById("source");
+    sourceDiv.innerHTML="";
     data.forEach((item)=>{
       if (item.newpar || curparagraph==null) {
         curparagraph=document.createElement("p");
-        sourcediv.appendChild(curparagraph)
+        sourceDiv.appendChild(curparagraph)
       }
       var span = document.createElement("span");
       span.classList.add("guanglun");
@@ -81,7 +106,30 @@ span.guanglun {
     }
     else return 0;
   }
-  setup(data);
+  function handleBtnConvert(ev){
+    //console.log(ev.target.textContent)
+    if (btnConvert.textContent=="廣論原文"){
+      try {
+        data = JSON.parse(textareaData.value);
+        setup(data);
+      }
+      catch(err){
+        alert(err);
+        return;
+      }
+      sourceDiv.style.display="block"
+      textareaData.style.display="none"
+      btnConvert.textContent="音檔資料";
+      btnConvert.setAttribute("title", title2);
+    } else {
+      sourceDiv.style.display="none"
+      textareaData.style.display="block"
+      btnConvert.textContent="廣論原文"
+      btnConvert.setAttribute("title", title1);
+    }
+  }
+  btnConvert.addEventListener("click",handleBtnConvert)
+  //setup(data);
 </script>
 </body>
 </html>
