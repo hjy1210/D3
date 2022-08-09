@@ -1,25 +1,47 @@
-<html>
-<style>
-span:hover {
-  background-color: yellow;
-  cursor:hand;
-}
-span.active:hover {
-  background-color: lightblue;
-  cursor:hand;
-}
-span.active {
-  background-color: lightblue;
-  cursor:hand;
-}
-span.guanglun {
-  font-family:標楷體;
-  font-size:16pt;
-}
-</style>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    span:hover {
+      background-color: yellow;
+      cursor: pointer;
+    }
+
+    span.active:hover {
+      background-color: lightblue;
+      cursor: pointer;
+    }
+
+    span.active {
+      background-color: lightblue;
+      cursor: pointer;
+    }
+
+    span.guanglun {
+      font-family: 標楷體;
+      font-size: 2vw;
+    }
+    button {
+      font-family: 標楷體;
+      font-size: 2vw;
+    }
+
+    .container {
+      position: relative;
+      width: 100%;
+      height: 100px;
+      overflow: auto;
+    }
+  </style>
+</head>
+
 <body>
-<button id="btnConvert" >廣論原文</button>
-<textarea id="data" rows="20" cols="40" style="display:block; font-size:16pt;">
+  <button id="btnConvert">廣論原文</button>
+  <textarea id="data" rows="20" cols="40" style="display:block; font-size:1.5vw;">
 [
  {
     "newpar": false,
@@ -37,99 +59,100 @@ span.guanglun {
  }
 ]
 </textarea>
-<div width="100%" id="source">
-</div>
-<div>
-<iframe width="100%" height="80%" id="iframe" ></iframe>
-</div>
-<script>
-  const title1="在下面的文字方塊中填上音檔相關資料後，按本鍵製作音檔連結";
-  const title2="要更新音檔資料，請按此鍵";
-  var data = [{
+  <div width="100%" id="source" class="container">
+  </div>
+  <div>
+    <iframe width="100%" height="450px" id="iframe"></iframe>
+  </div>
+  <script>
+    const title1 = "在下面的文字方塊中填上音檔相關資料後，按本鍵製作音檔連結";
+    const title2 = "要更新音檔資料，請按此鍵";
+    var data = [{
       "newpar": false,
-      "source":"第二說法軌理分四,一思惟說法所有勝利,二發起承事大師及法,三以何意樂加行而說,四於何等境應說不說所有差別。",
-      "startvol":"12b",
-      "starttime":"7:12",
-      "endtime":"10:8"
+      "source": "第二說法軌理分四,一思惟說法所有勝利,二發起承事大師及法,三以何意樂加行而說,四於何等境應說不說所有差別。",
+      "startvol": "12b",
+      "starttime": "7:12",
+      "endtime": "10:8"
     }, {
       "newpar": true,
-      "source":"若不顧慮利養恭敬名等染事，而說法者勝利極大。《勸發增上意樂》中云：「慈氏，無染法施，謂不希欲，利養恭敬，而施法施。此二十種是其勝利。",
-      "startvol":"12b",
-      "starttime":"10:08",
-      "endtime":"12:22"
+      "source": "若不顧慮利養恭敬名等染事，而說法者勝利極大。《勸發增上意樂》中云：「慈氏，無染法施，謂不希欲，利養恭敬，而施法施。此二十種是其勝利。",
+      "startvol": "12b",
+      "starttime": "10:08",
+      "endtime": "12:22"
     }
-  ];
-  var curparagraph = null;
-  const iframe= document.getElementById('iframe');
-  const btnConvert=document.getElementById("btnConvert");
-  btnConvert.setAttribute("title", title1);
-  const textareaData = document.getElementById("data");
-  const sourceDiv=document.getElementById("source");
-  var activeSpan=null;
-  function setYinDang(element){
-    if (activeSpan == element) return;
-    if (activeSpan!=null) 
-      activeSpan.classList.remove("active");
-    activeSpan = element;
-    element.classList.add("active");
-    iframe.setAttribute("src", element.getAttribute("src"));
-  }
-  function setup(data){
-    curparagraph = null;
-    activeSpan = null;
-    sourceDiv.innerHTML="";
-    data.forEach((item)=>{
-      if (item.newpar || curparagraph==null) {
-        curparagraph=document.createElement("p");
-        sourceDiv.appendChild(curparagraph)
+    ];
+    var curparagraph = null;
+    const iframe = document.getElementById('iframe');
+    const btnConvert = document.getElementById("btnConvert");
+    btnConvert.setAttribute("title", title1);
+    const textareaData = document.getElementById("data");
+    const sourceDiv = document.getElementById("source");
+    var activeSpan = null;
+    function setYinDang(element) {
+      if (activeSpan == element) return;
+      if (activeSpan != null)
+        activeSpan.classList.remove("active");
+      activeSpan = element;
+      element.classList.add("active");
+      iframe.setAttribute("src", element.getAttribute("src"));
+    }
+    function setup(data) {
+      curparagraph = null;
+      activeSpan = null;
+      sourceDiv.innerHTML = "";
+      data.forEach((item) => {
+        if (item.newpar || curparagraph == null) {
+          curparagraph = document.createElement("p");
+          sourceDiv.appendChild(curparagraph)
+        }
+        var span = document.createElement("span");
+        span.classList.add("guanglun");
+        span.textContent = item.source;
+        var src = `https://lamrim.xyz/player2/?&tch=gl1&af1=${item.startvol}&st1=${minsec2sec(item.starttime)}`;
+        if (item.endvol && item.endvol != item.startvol) {
+          src = src + `&af2=${item.endvol}&et2=${minsec2sec(item.endtime)}`
+        } else {
+          src = src + `&et1=${minsec2sec(item.endtime)}`
+        }
+        span.setAttribute("src", src);
+        span.addEventListener("click", (ev) => setYinDang(ev.target));
+        curparagraph.appendChild(span)
+      })
+    }
+    function minsec2sec(minsec) {
+      var tokens = minsec.split(":")
+      if (tokens.length == 1)
+        return parseInt(minsec);
+      else if (tokens.length == 2) {
+        return parseInt(tokens[0]) * 60 + parseInt(tokens[1]);
       }
-      var span = document.createElement("span");
-      span.classList.add("guanglun");
-      span.textContent=item.source;
-      var src=`https://lamrim.xyz/player2/?&tch=gl1&af1=${item.startvol}&st1=${minsec2sec(item.starttime)}`;
-      if (item.endvol && item.endvol!=item.startvol){
-        src = src + `&af2=${item.endvol}&et2=${minsec2sec(item.endtime)}`
+      else return 0;
+    }
+    function handleBtnConvert(ev) {
+      //console.log(ev.target.textContent)
+      if (btnConvert.textContent == "廣論原文") {
+        try {
+          data = JSON.parse(textareaData.value);
+          setup(data);
+        }
+        catch (err) {
+          alert(err);
+          return;
+        }
+        sourceDiv.style.display = "block"
+        textareaData.style.display = "none"
+        btnConvert.textContent = "音檔資料";
+        btnConvert.setAttribute("title", title2);
       } else {
-        src = src + `&et1=${minsec2sec(item.endtime)}`
+        sourceDiv.style.display = "none"
+        textareaData.style.display = "block"
+        btnConvert.textContent = "廣論原文"
+        btnConvert.setAttribute("title", title1);
       }
-      span.setAttribute("src", src);
-      span.addEventListener("click", (ev) => setYinDang(ev.target));
-      curparagraph.appendChild(span)
-    })
-  }
-  function minsec2sec(minsec){
-    var tokens=minsec.split(":")
-    if (tokens.length==1)
-      return parseInt(minsec);
-    else if (tokens.length==2) {
-      return parseInt(tokens[0])*60+parseInt(tokens[1]);
     }
-    else return 0;
-  }
-  function handleBtnConvert(ev){
-    //console.log(ev.target.textContent)
-    if (btnConvert.textContent=="廣論原文"){
-      try {
-        data = JSON.parse(textareaData.value);
-        setup(data);
-      }
-      catch(err){
-        alert(err);
-        return;
-      }
-      sourceDiv.style.display="block"
-      textareaData.style.display="none"
-      btnConvert.textContent="音檔資料";
-      btnConvert.setAttribute("title", title2);
-    } else {
-      sourceDiv.style.display="none"
-      textareaData.style.display="block"
-      btnConvert.textContent="廣論原文"
-      btnConvert.setAttribute("title", title1);
-    }
-  }
-  btnConvert.addEventListener("click",handleBtnConvert)
+    btnConvert.addEventListener("click", handleBtnConvert)
   //setup(data);
-</script>
+  </script>
 </body>
+
 </html>
